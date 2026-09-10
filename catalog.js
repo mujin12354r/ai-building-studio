@@ -1,34 +1,24 @@
-export const STYLES=['Modern','Japanese','Scandinavian','Industrial','Luxury','Classic','Natural','Cyberpunk'];
-export const CATEGORIES=['Living','Bedroom','Dining','Kitchen','Office','Storage','Bathroom','Decor','Lighting','Feature'];
-export const CATALOG=[
-['sofa','3-Seat Sofa','Living','▰',180,80,1290,['Modern','Japanese','Scandinavian','Luxury'],'#d7c9b8'],
-['sectional','L-Sectional','Living','▰',220,150,2490,['Modern','Scandinavian','Luxury'],'#c9c0b5'],
-['coffee','Coffee Table','Living','◯',110,70,490,['Modern','Japanese','Classic'],'#a97952'],
-['tv','Media Console','Living','▭',150,38,890,['Modern','Industrial','Classic'],'#2d3033'],
-['bed','Double Bed','Bedroom','▱',170,215,1890,['Modern','Japanese','Scandinavian','Luxury'],'#ddd3c8'],
-['singlebed','Single Bed','Bedroom','▱',110,205,990,['Modern','Japanese','Natural'],'#ddd3c8'],
-['wardrobe','Wardrobe','Bedroom','▤',120,60,1390,['Modern','Classic','Luxury'],'#8d725d'],
-['nightstand','Nightstand','Bedroom','▥',45,45,290,['Modern','Japanese','Classic'],'#a88667'],
-['dining','Dining Table','Dining','○',150,90,1190,['Modern','Japanese','Scandinavian'],'#a97e5d'],
-['chair','Dining Chair','Dining','◇',45,45,220,['Modern','Scandinavian','Classic'],'#b8aa98'],
-['desk','Work Desk','Office','▬',140,65,790,['Modern','Industrial','Natural'],'#9f8060'],
-['officechair','Office Chair','Office','◉',55,55,420,['Modern','Industrial'],'#313538'],
-['bookshelf','Bookshelf','Storage','▥',100,35,690,['Modern','Industrial','Natural'],'#9a765b'],
-['plant','Indoor Plant','Decor','✿',45,45,95,['Natural','Modern','Japanese'],'#61745a'],
-['lamp','Floor Lamp','Lighting','♢',40,40,180,['Modern','Luxury','Classic'],'#c2a264'],
-['rug','Area Rug','Decor','▧',190,130,450,['Modern','Japanese','Scandinavian','Natural'],'#b7aa98'],
-['island','Kitchen Island','Kitchen','▰',180,75,2190,['Modern','Industrial','Natural'],'#b0a18f'],
-['counter','Kitchen Counter','Kitchen','▬',220,55,2490,['Modern','Industrial','Classic'],'#b9b0a1'],
-['sink','Vanity Sink','Bathroom','◒',90,50,790,['Modern','Luxury','Classic'],'#e3dfd6'],
-['bathtub','Freestanding Bath','Bathroom','◡',150,75,2290,['Modern','Luxury','Japanese'],'#e7e2d9'],
-['toilet','Toilet','Bathroom','◉',55,70,550,['Modern','Classic'],'#eeeae2'],
-['fireplace','Fireplace','Feature','▤',100,30,3100,['Classic','Luxury','Modern'],'#56514b']
-].map(([id,name,category,icon,w,h,price,variants,color])=>({id,name,category,icon,w,h,price,variants,color}));
-export const ROOM_COLORS=['#e9dfd0','#dfe6da','#e1e7ed','#e9e3ef','#e6ded1','#dfe5df'];
+export const STYLES=['Modern German','Bauhaus','Scandinavian','Japandi','Berlin Loft','Minimal','Natural','Luxury','Classic','Alpine Modern'];
+export const CATEGORIES=['Seating','Tables','Beds','Storage','Kitchen','Bathroom','Lighting','Decor','Appliances','Architecture','Outdoor','Office'];
+const A=(id,name,category,icon,w,h,price,color,variants=CATEGORIES)=>({id,name,category,icon,w,h,price,color,variants});
+const rows=[
+['sofa','3-Seat Sofa','Seating','SOFA',180,85,1290,'#b9aa99'],['sectional','L-Sectional Sofa','Seating','L',240,160,2490,'#9d9185'],['armchair','Lounge Chair','Seating','CHAIR',75,75,690,'#bcae9e'],['loveseat','2-Seat Sofa','Seating','LOVE',140,82,990,'#c7b9a8'],['bench','Upholstered Bench','Seating','BENCH',130,45,520,'#a9957e'],['stool','Bar Stool','Seating','STOOL',42,42,180,'#92745d'],
+['coffee','Coffee Table','Tables','TABLE',110,70,490,'#9a6e4f'],['side','Side Table','Tables','SIDE',55,55,290,'#ad8764'],['console','Console Table','Tables','CONSOLE',145,42,690,'#80654f'],['dining','Dining Table','Tables','DINING',160,90,1190,'#a77c58'],['roundtable','Round Dining Table','Tables','ROUND',120,120,1090,'#a77c58'],
+['bed','Double Bed 180','Beds','BED',180,210,1890,'#d8cec2'],['queenbed','Double Bed 160','Beds','BED',160,205,1590,'#d8cec2'],['singlebed','Single Bed','Beds','BED',105,205,990,'#d8cec2'],['nightstand','Nightstand','Beds','NIGHT',48,45,290,'#9b7657'],['dresser','Dresser','Beds','DRESS',120,48,890,'#94745b'],
+['wardrobe','Built-in Wardrobe','Storage','WARD',160,60,2190,'#8e7661'],['cabinet','Low Cabinet','Storage','CAB',150,45,990,'#7c6654'],['bookshelf','Bookcase','Storage','BOOK',100,38,690,'#987457'],['shelving','Open Shelving','Storage','SHELF',140,35,790,'#a48668'],['shoe','Shoe Cabinet','Storage','SHOE',100,35,590,'#8c7664'],
+['counter','Kitchen Run','Kitchen','KITCHEN',240,60,2490,'#b9b0a1'],['island','Kitchen Island','Kitchen','ISLAND',180,80,2190,'#aaa095'],['peninsula','Kitchen Peninsula','Kitchen','PEN',170,60,1690,'#aaa095'],['tallunit','Tall Kitchen Unit','Kitchen','TALL',65,60,990,'#9b8976'],['sink','Kitchen Sink','Kitchen','SINK',70,50,520,'#d8d5cf'],['fridge','Fridge','Appliances','FRIDGE',70,70,1290,'#b8b9b7'],['oven','Oven Tower','Appliances','OVEN',65,60,990,'#4e5050'],['dishwasher','Dishwasher','Appliances','DISH',60,55,690,'#b5b6b3'],['hood','Extractor Hood','Appliances','HOOD',90,40,790,'#626362'],
+['vanity','Bathroom Vanity','Bathroom','VANITY',110,50,890,'#c9c2b7'],['bathtub','Freestanding Bathtub','Bathroom','BATH',160,78,2290,'#e2ded6'],['shower','Walk-in Shower','Bathroom','SHOWER',110,100,1590,'#c7d0ce'],['toilet','Wall Toilet','Bathroom','WC',55,70,550,'#eeeae2'],['bidet','Bidet','Bathroom','BIDET',55,65,490,'#eeeae2'],['mirror','Bathroom Mirror','Bathroom','MIRROR',80,12,390,'#c9c9c5'],
+['floorlamp','Floor Lamp','Lighting','LAMP',42,42,180,'#b19a69'],['pendant','Pendant Light','Lighting','PEND',45,45,320,'#b19a69'],['spot','Ceiling Spots','Lighting','SPOT',80,20,290,'#c4c2b8'],['walllight','Wall Light','Lighting','WALL',30,18,220,'#b19a69'],['tablelamp','Table Lamp','Lighting','TABLEL',30,30,160,'#b19a69'],
+['rug','Area Rug','Decor','RUG',190,130,450,'#b2a696'],['plant','Large Indoor Plant','Decor','PLANT',48,48,95,'#61745a'],['plant2','Olive Tree','Decor','TREE',55,55,240,'#68735c'],['art','Art Frame','Decor','ART',70,10,260,'#806c5c'],['mirrorfull','Full Height Mirror','Decor','MIRROR',55,12,420,'#b8bbb8'],['curtain','Curtain Pair','Decor','CURTAIN',130,15,390,'#c8c1b6'],['fireplace','Fireplace','Decor','FIRE',110,32,3100,'#57514b'],['tv','TV + Media Wall','Decor','TV',155,35,1490,'#303234'],
+['desk','Work Desk','Office','DESK',140,65,790,'#96765a'],['officechair','Office Chair','Office','CHAIR',55,55,420,'#343737'],['meeting','Meeting Table','Office','MEET',180,85,1490,'#92765e'],['whiteboard','Whiteboard','Office','BOARD',120,15,390,'#ecebe6'],['printer','Printer Station','Office','PRINT',70,45,490,'#a7a7a2'],
+['washer','Washing Machine','Appliances','WASH',62,62,790,'#d2d2cf'],['dryer','Dryer','Appliances','DRY',62,62,790,'#d2d2cf'],['microwave','Microwave','Appliances','MICRO',55,45,290,'#656766'],['coffeeapp','Coffee Machine','Appliances','COFFEE',42,42,490,'#4d4b47'],
+['door','Interior Door','Architecture','DOOR',85,12,690,'#92735b'],['slidingdoor','Sliding Glass Door','Architecture','SLIDE',150,12,1890,'#aeb8b7'],['window','Large Window','Architecture','WINDOW',140,12,1490,'#b8c3c3'],['window2','Floor-to-Ceiling Window','Architecture','WINDOW',180,12,2490,'#aebbbb'],['stairs','Straight Stair','Architecture','STAIR',170,55,3900,'#9a8068'],['railing','Glass Railing','Architecture','RAIL',150,12,1290,'#b7c1c0'],['column','Structural Column','Architecture','COL',35,35,690,'#c4bdb3'],
+['balcony','Balcony Set','Outdoor','BAL',180,100,2490,'#9e9a91'],['garden','Planter Box','Outdoor','PLANTER',100,35,290,'#817c6d'],['outdoorsofa','Outdoor Sofa','Outdoor','OSOFA',170,80,1590,'#aaa69c'],['outtable','Outdoor Table','Outdoor','OTABLE',100,70,690,'#8c806d'],['grill','BBQ Grill','Outdoor','GRILL',80,45,590,'#555655'],
+].map(r=>A(...r));
+export const CATALOG=rows;
+export const ROOM_COLORS=['#e8e0d5','#dfe5dc','#dfe6eb','#e7e1eb','#e8e1d5','#dfe4df','#e4e0d9','#e0e5e8'];
 export const ROOM_PRESETS=[
-['Living Room',390,240,'Modern'],['Bedroom',340,300,'Japanese'],['Kitchen',330,220,'Scandinavian'],['Bathroom',260,200,'Modern'],['Office',300,230,'Industrial'],['Dining Room',350,230,'Classic']
-];
-export const BUILDINGS=[
-['City Apartment','3 levels · 98 m²','Modern'],['Family House','2 levels · 168 m²','Scandinavian'],['Compact Studio','1 level · 42 m²','Japanese'],['Design Office','2 levels · 130 m²','Industrial']
-];
-export function getCatalog(id){return CATALOG.find(x=>x.id===id)}
+['Wohnzimmer',420,270,'Modern German'],['Schlafzimmer',340,300,'Japandi'],['Küche',340,230,'Bauhaus'],['Bad',270,210,'Minimal'],['Arbeitszimmer',300,230,'Berlin Loft'],['Esszimmer',350,230,'Scandinavian'],['Flur',260,150,'Modern German'],['Balkon',280,150,'Alpine Modern']];
+export const BUILDINGS=[['Stadtwohnung','3 Ebenen · 98 m²','Modern German'],['Einfamilienhaus','2 Ebenen · 168 m²','Scandinavian'],['Altbauwohnung','1 Ebene · 112 m²','Classic'],['Neubau Penthouse','1 Ebene · 126 m²','Luxury'],['Kompaktwohnung','1 Ebene · 48 m²','Minimal'],['Reihenhaus','2 Ebenen · 142 m²','Japandi']];
+export const MATERIALS=['Eiche natur','Eiche geräuchert','Walnuss','Beton hell','Beton dunkel','Terrazzo','Travertin','Keramik weiß','Keramik anthrazit','Naturstein','Linoleum','Parkett Fischgrät','Parkett Stab','Teppich warmgrau'];
+export const getCatalog=id=>CATALOG.find(x=>x.id===id);

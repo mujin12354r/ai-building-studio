@@ -1,21 +1,15 @@
-import {getCatalog,ROOM_COLORS} from './catalog.js';
+import {getCatalog,ROOM_COLORS,BUILDINGS} from './catalog.js';
 export const snap=(n,g=10)=>Math.round(n/g)*g;
+export const uid=()=>crypto.randomUUID();
 export const cost=p=>p.items.filter(i=>i.level===p.level).reduce((s,i)=>s+i.price,0);
-export function addItem(p,catalogId,{x=280,y=240,level=p.level,roomId=null,variant=null}={}){
- const c=getCatalog(catalogId);if(!c)return p;const room=p.rooms.find(r=>r.id===roomId)||p.rooms.find(r=>r.level===level);const px=x??(room?room.x+room.w/2-c.w/2:280),py=y??(room?room.y+room.h/2-c.h/2:240);
- const item={id:crypto.randomUUID(),catalogId:c.id,name:c.name,kind:'furniture',x:snap(px),y:snap(py),w:c.w,h:c.h,rotation:0,scale:1,level,variant:variant||c.variants[0],price:c.price,color:c.color,z:20};
- return {...p,items:[...p.items,item],updatedAt:new Date().toISOString()};
-}
-export function addRoom(p,name,x,y,w,h,style='Modern',level=p.level){return {...p,rooms:[...p.rooms,{id:crypto.randomUUID(),name,x,y,w,h,level,style,color:ROOM_COLORS[p.rooms.length%ROOM_COLORS.length]}]};}
-export function concept(p,prompt){const q=prompt.toLowerCase();let style='Modern';if(/japan|zen/.test(q))style='Japanese';else if(/scandi|nordic/.test(q))style='Scandinavian';else if(/industrial|loft/.test(q))style='Industrial';else if(/luxury|premium/.test(q))style='Luxury';
- let n={...p,rooms:p.rooms.map(r=>r.level===p.level?{...r,style}:r),items:p.items.filter(i=>i.level!==p.level)};const room=n.rooms.find(r=>r.level===p.level);
- let ids=['sofa','coffee','tv','rug','plant','lamp'];if(/bedroom|sleep/.test(q))ids=['bed','nightstand','nightstand','wardrobe','lamp'];if(/kitchen/.test(q))ids=['counter','island','sink','plant'];if(/office|work/.test(q))ids=['desk','officechair','bookshelf','lamp'];
- ids.forEach(id=>{n=addItem(n,id,{roomId:room?.id,level:p.level,variant:style})});return n;
-}
-export function projectTemplate(p,type){let n={...p,rooms:[],items:[]};const layouts={
-'City Apartment':[['Living Room',80,80,450,300,'Modern'],['Kitchen',560,80,320,220,'Scandinavian'],['Bedroom',560,330,320,280,'Japanese'],['Office',80,410,320,200,'Industrial']],
-'Family House':[['Living Room',70,70,500,340,'Scandinavian'],['Kitchen',600,70,350,240,'Modern'],['Dining Room',70,440,350,220,'Classic'],['Bedroom',450,340,300,260,'Natural']],
-'Compact Studio':[['Studio Living',100,100,700,420,'Japanese']],
-'Design Office':[['Open Office',70,80,780,300,'Industrial'],['Meeting',70,420,360,210,'Modern'],['Lounge',480,420,360,210,'Luxury']]
-};(layouts[type]||layouts['City Apartment']).forEach(r=>{n=addRoom(n,...r,p.level)});return n;
-}
+export function addItem(p,catalogId,o={}){const c=getCatalog(catalogId);if(!c)return p;const room=p.rooms.find(r=>r.id===o.roomId)||p.rooms.find(r=>r.level===(o.level??p.level));const x=o.x??(room?room.x+room.w/2-c.w/2:350),y=o.y??(room?room.y+room.h/2-c.h/2:280);const item={id:uid(),catalogId:c.id,name:c.name,kind:'asset',x:snap(x),y:snap(y),w:c.w,h:c.h,rotation:0,scale:1,level:o.level??p.level,variant:o.variant||c.variants[0],price:c.price,color:c.color,z:20,material:'Eiche natur'};return {...p,items:[...p.items,item],updatedAt:new Date().toISOString()};}
+export function addRoom(p,name,x,y,w,h,style='Modern German',level=p.level){return {...p,rooms:[...p.rooms,{id:uid(),name,x,y,w,h,level,style,color:ROOM_COLORS[p.rooms.length%ROOM_COLORS.length],floor:'Parkett Stab'}]};}
+export function template(p,type){const data={
+'Stadtwohnung':[['Wohnzimmer',55,55,480,300,'Modern German'],['Küche',560,55,300,220,'Bauhaus'],['Schlafzimmer',560,305,300,285,'Japandi'],['Arbeitszimmer',55,390,300,200,'Berlin Loft'],['Bad',375,390,160,200,'Minimal']],
+'Einfamilienhaus':[['Wohnzimmer',55,55,520,330,'Scandinavian'],['Küche',610,55,300,240,'Bauhaus'],['Esszimmer',55,420,350,210,'Scandinavian'],['Schlafzimmer',430,420,300,230,'Japandi'],['Bad',750,320,160,210,'Minimal']],
+'Altbauwohnung':[['Wohnzimmer',60,60,480,310,'Classic'],['Esszimmer',560,60,310,250,'Classic'],['Schlafzimmer',560,340,310,260,'Japandi'],['Küche',60,400,300,200,'Bauhaus'],['Flur',380,400,150,200,'Modern German']],
+'Neubau Penthouse':[['Open Living',60,60,560,350,'Luxury'],['Kitchen',650,60,270,240,'Bauhaus'],['Bedroom',60,450,360,210,'Japandi'],['Bath',450,450,190,210,'Luxury'],['Office',680,340,240,220,'Modern German']],
+'Kompaktwohnung':[['Wohnen / Schlafen',100,90,650,390,'Minimal'],['Küche',100,500,260,170,'Bauhaus'],['Bad',390,500,180,170,'Minimal']],
+'Reihenhaus':[['Wohnen',55,55,500,320,'Scandinavian'],['Küche',590,55,300,230,'Bauhaus'],['Essen',55,410,330,210,'Scandinavian'],['Schlafzimmer',420,410,300,220,'Japandi'],['Bad',740,340,150,200,'Minimal']]};let n={...p,rooms:[],items:[]};(data[type]||data['Stadtwohnung']).forEach(r=>n=addRoom(n,...r,p.level));return seedFurniture(n);}
+export function seedFurniture(p){let n=p;const room=n.rooms.find(r=>r.name.toLowerCase().includes('wohn')||r.name.toLowerCase().includes('living'));if(room){[['sofa',room.x+70,room.y+100],['coffee',room.x+230,room.y+160],['rug',room.x+150,room.y+100],['tv',room.x+270,room.y+30],['plant',room.x+360,room.y+190]].forEach(([id,x,y])=>n=addItem(n,id,{x,y,roomId:room.id}));}return n;}
+export function concept(p,prompt){const q=prompt.toLowerCase();let style='Modern German';if(/bauhaus/.test(q))style='Bauhaus';else if(/japan|japandi|zen/.test(q))style='Japandi';else if(/scandi|nordic/.test(q))style='Scandinavian';else if(/loft|industrial|berlin/.test(q))style='Berlin Loft';else if(/luxury|premium/.test(q))style='Luxury';let n={...p,rooms:p.rooms.map(r=>r.level===p.level?{...r,style}:r),items:p.items.filter(i=>i.level!==p.level)};const room=n.rooms.find(r=>r.level===p.level);let ids=['sofa','coffee','rug','tv','plant','floorlamp'];if(/bed|schlaf/.test(q))ids=['bed','nightstand','wardrobe','dresser','rug','tablelamp'];if(/kitchen|küche/.test(q))ids=['counter','island','fridge','oven','hood','stool'];if(/bath|bad/.test(q))ids=['vanity','shower','toilet','mirror','plant'];if(/office|work|büro/.test(q))ids=['desk','officechair','bookshelf','floorlamp','art'];ids.forEach((id,k)=>n=addItem(n,id,{roomId:room?.id,level:p.level,x:(room?.x||100)+40+(k%3)*110,y:(room?.y||100)+50+Math.floor(k/3)*100,variant:style}));return n;}

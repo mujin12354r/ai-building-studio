@@ -1,1 +1,1 @@
-{"name":"BuildSpace Housing Simulation Studio","short_name":"BuildSpace","start_url":"./","display":"standalone","background_color":"#f5f4ef","theme_color":"#171717","icons":[{"src":"./favicon.svg","sizes":"64x64","type":"image/svg+xml"}]}
+{"name":"BuildSpace German Housing Design Studio","short_name":"BuildSpace","start_url":"./","display":"standalone","background_color":"#f3f2ef","theme_color":"#222824","icons":[{"src":"./favicon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
