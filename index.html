@@ -2,79 +2,917 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#111827">
 <title>BuildSpace</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial;background:#111827;color:white}
-header{padding:16px;background:#1e293b;font-size:20px;font-weight:bold}
-nav{padding:10px;background:#0f172a;display:flex;gap:6px;flex-wrap:wrap}
-button{padding:10px 13px;border:0;border-radius:8px;background:#2563eb;color:white}
-button:active{background:#1d4ed8}
-#canvas{position:relative;width:900px;height:600px;margin:20px auto;background:#f8fafc;color:#111;overflow:hidden}
-.item{position:absolute;padding:10px;font-size:32px;cursor:move;user-select:none}
-.room{position:absolute;border:4px solid #475569;background:#ffffff;color:#111;padding:8px}
-@media(max-width:700px){
-#canvas{transform:scale(.55);transform-origin:top left;margin-left:10px}
+html,body{margin:0;width:100%;height:100%;font-family:Arial,sans-serif;background:#0f172a;color:#e5e7eb}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+header{
+height:58px;background:#111827;border-bottom:1px solid #334155;
+display:flex;align-items:center;padding:0 12px;gap:12px;flex-shrink:0
+}
+.logo{font-size:19px;font-weight:bold;white-space:nowrap}
+.logo span{color:#60a5fa}
+.project{color:#94a3b8;font-size:12px}
+.headerButtons{margin-left:auto;display:flex;gap:5px}
+.btn{
+background:#1e293b;color:white;border:1px solid #475569;
+border-radius:7px;padding:8px 11px
+}
+.btn.primary{background:#2563eb;border-color:#3b82f6}
+.btn.red{background:#991b1b}
+
+.main{display:flex;flex:1;min-height:0}
+
+.sidebar{
+width:280px;background:#111827;border-right:1px solid #334155;
+overflow:auto;padding:12px;flex-shrink:0
+}
+
+.title{
+font-size:11px;color:#94a3b8;text-transform:uppercase;
+letter-spacing:1px;font-weight:bold;margin:16px 0 8px
+}
+.title:first-child{margin-top:0}
+
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+
+.tool{
+background:#1e293b;color:white;border:1px solid #334155;
+border-radius:8px;padding:9px 3px;text-align:center
+}
+.tool:hover{background:#293548}
+.tool b{display:block;font-size:22px}
+.tool small{font-size:10px}
+
+.field{margin-bottom:8px}
+.field label{display:block;color:#94a3b8;font-size:11px;margin-bottom:4px}
+input,select{
+width:100%;padding:8px;border-radius:7px;
+background:#0f172a;color:white;border:1px solid #334155
+}
+
+.style{
+width:100%;margin-bottom:6px;padding:9px;text-align:left;
+background:#1e293b;color:white;border:1px solid #334155;border-radius:7px
+}
+
+.editor{flex:1;display:flex;flex-direction:column;min-width:0}
+
+.toolbar{
+height:48px;background:#111827;border-bottom:1px solid #334155;
+display:flex;align-items:center;gap:6px;padding:6px;overflow-x:auto
+}
+
+.workspace{
+flex:1;overflow:auto;background:#080f1c;
+padding:30px;position:relative
+}
+
+.canvas{
+position:relative;
+width:1000px;
+height:650px;
+margin:auto;
+background-color:#f8fafc;
+background-image:
+linear-gradient(#dce3eb 1px,transparent 1px),
+linear-gradient(90deg,#dce3eb 1px,transparent 1px);
+background-size:20px 20px;
+box-shadow:0 20px 50px #0008;
+overflow:hidden;
+transform-origin:top left
+}
+
+.canvas.japanese{background-color:#f4f0e6}
+.canvas.dark{background-color:#252525}
+.canvas.luxury{background-color:#fff8df}
+
+.room{
+position:absolute;
+border:4px solid #475569;
+background:#ffffffaa;
+color:#111;
+user-select:none
+}
+.room.selected{outline:3px solid #3b82f6;z-index:100}
+.roomName{
+position:absolute;left:7px;top:7px;
+font-weight:bold;font-size:13px;
+background:#111827dd;color:white;padding:4px 7px;border-radius:5px
+}
+
+.object{
+position:absolute;
+display:flex;
+align-items:center;
+justify-content:center;
+user-select:none;
+touch-action:none;
+cursor:move;
+z-index:20;
+border:2px solid transparent;
+font-size:32px
+}
+.object.selected{border:2px solid #2563eb}
+.objectLabel{
+position:absolute;bottom:-16px;font-size:9px;
+white-space:nowrap;color:#111
+}
+
+.resize{
+position:absolute;
+width:10px;height:10px;
+right:-5px;bottom:-5px;
+background:#2563eb;border-radius:2px;
+cursor:nwse-resize
+}
+
+.status{
+height:31px;background:#111827;border-top:1px solid #334155;
+padding:7px 10px;font-size:11px;color:#94a3b8
+}
+
+.panel{
+position:fixed;right:15px;bottom:45px;
+background:#111827;border:1px solid #475569;
+border-radius:10px;padding:14px;width:280px;
+box-shadow:0 15px 40px #0009;z-index:500
+}
+.panel h3{margin:0 0 10px}
+
+.mobileTools{
+display:none
+}
+
+@media(max-width:750px){
+header{height:54px}
+.logo{font-size:16px}
+.project{display:none}
+.headerButtons .btn{padding:7px}
+.headerButtons .optional{display:none}
+
+.sidebar{
+position:fixed;
+z-index:400;
+top:54px;
+bottom:0;
+left:0;
+transform:translateX(-100%);
+transition:.2s
+}
+.sidebar.open{transform:translateX(0)}
+
+.mobileTools{
+display:block;
+position:fixed;
+top:62px;
+left:8px;
+z-index:300
+}
+.mobileTools button{
+background:#111827;color:white;border:1px solid #475569;
+border-radius:7px;padding:8px
+}
+
+.workspace{padding:75px 15px 20px}
+.canvas{margin:0;width:1000px;height:650px}
 }
 </style>
 </head>
 
 <body>
 
-<header>BUILDSPACE - AI ROOM DESIGNER</header>
+<div class="app">
 
-<nav>
-<button onclick="addRoom()">ROOM</button>
-<button onclick="addItem('SOFA')">SOFA</button>
-<button onclick="addItem('BED')">BED</button>
-<button onclick="addItem('TABLE')">TABLE</button>
-<button onclick="addItem('PLANT')">PLANT</button>
-<button onclick="design()">AI DESIGN</button>
-<button onclick="save()">SAVE</button>
-</nav>
+<header>
+<div class="logo">BUILD<span>SPACE</span></div>
+<div class="project" id="projectTitle">My Building</div>
 
-<div id="canvas"></div>
+<div class="headerButtons">
+<button class="btn" onclick="newProject()">New</button>
+<button class="btn" onclick="saveProject()">Save</button>
+<button class="btn optional" onclick="exportJSON()">Export</button>
+<button class="btn optional" onclick="document.getElementById('import').click()">Import</button>
+<button class="btn primary" onclick="downloadDesign()">Image</button>
+<input id="import" type="file" accept=".json" hidden onchange="importJSON(event)">
+</div>
+</header>
+
+<div class="main">
+
+<aside class="sidebar" id="sidebar">
+
+<div class="title">Building</div>
+
+<div class="field">
+<label>Name</label>
+<input id="buildingName" value="My Building">
+</div>
+
+<div class="field">
+<label>Floor</label>
+<select id="floor" onchange="changeFloor()">
+<option value="0">Ground Floor</option>
+<option value="1">First Floor</option>
+<option value="2">Second Floor</option>
+<option value="3">Third Floor</option>
+</select>
+</div>
+
+<div class="title">Rooms</div>
+
+<div class="grid">
+<button class="tool" onclick="addRoom('Living Room')"><b>LR</b><small>Living</small></button>
+<button class="tool" onclick="addRoom('Bedroom')"><b>BR</b><small>Bedroom</small></button>
+<button class="tool" onclick="addRoom('Kitchen')"><b>KT</b><small>Kitchen</small></button>
+<button class="tool" onclick="addRoom('Bathroom')"><b>BA</b><small>Bathroom</small></button>
+<button class="tool" onclick="addRoom('Office')"><b>OF</b><small>Office</small></button>
+<button class="tool" onclick="addRoom('Dining')"><b>DI</b><small>Dining</small></button>
+</div>
+
+<div class="title">Furniture</div>
+
+<div class="grid">
+<button class="tool" onclick="addObject('Sofa','SOFA')"><b>SF</b><small>Sofa</small></button>
+<button class="tool" onclick="addObject('Bed','BED')"><b>BD</b><small>Bed</small></button>
+<button class="tool" onclick="addObject('Table','TABLE')"><b>TB</b><small>Table</small></button>
+<button class="tool" onclick="addObject('Chair','CHAIR')"><b>CH</b><small>Chair</small></button>
+<button class="tool" onclick="addObject('Desk','DESK')"><b>DK</b><small>Desk</small></button>
+<button class="tool" onclick="addObject('TV','TV')"><b>TV</b><small>TV</small></button>
+<button class="tool" onclick="addObject('Plant','PLANT')"><b>PL</b><small>Plant</small></button>
+<button class="tool" onclick="addObject('Lamp','LAMP')"><b>LM</b><small>Lamp</small></button>
+<button class="tool" onclick="addObject('Wardrobe','WARDROBE')"><b>WR</b><small>Wardrobe</small></button>
+</div>
+
+<div class="title">Building Elements</div>
+
+<div class="grid">
+<button class="tool" onclick="addObject('Door','DOOR')"><b>DR</b><small>Door</small></button>
+<button class="tool" onclick="addObject('Window','WINDOW')"><b>WN</b><small>Window</small></button>
+<button class="tool" onclick="addObject('Stairs','STAIRS')"><b>ST</b><small>Stairs</small></button>
+</div>
+
+<div class="title">Interior Styles</div>
+
+<button class="style" onclick="applyStyle('modern')">Modern</button>
+<button class="style" onclick="applyStyle('japanese')">Japanese Minimalist</button>
+<button class="style" onclick="applyStyle('scandinavian')">Scandinavian</button>
+<button class="style" onclick="applyStyle('industrial')">Industrial</button>
+<button class="style" onclick="applyStyle('luxury')">Luxury</button>
+
+<div class="title">AI Room Designer</div>
+
+<div class="field">
+<label>Describe your design</label>
+<input id="prompt" placeholder="Japanese minimalist bedroom">
+</div>
+
+<button class="btn primary" style="width:100%" onclick="aiDesign()">
+AI DESIGN
+</button>
+
+<div class="title">Selected</div>
+
+<button class="btn red" style="width:100%" onclick="deleteSelected()">
+Delete Selected
+</button>
+
+</aside>
+
+<section class="editor">
+
+<div class="toolbar">
+<button class="btn" onclick="toggleSidebar()">Tools</button>
+<button class="btn" onclick="zoom(-0.1)">-</button>
+<button class="btn" onclick="resetZoom()">100%</button>
+<button class="btn" onclick="zoom(0.1)">+</button>
+<button class="btn" onclick="rotateSelected()">Rotate</button>
+<button class="btn" onclick="duplicateSelected()">Duplicate</button>
+<button class="btn" onclick="clearFloor()">Clear Floor</button>
+</div>
+
+<div class="workspace">
+<div class="mobileTools">
+<button onclick="toggleSidebar()">TOOLS</button>
+</div>
+
+<div id="canvas" class="canvas"></div>
+</div>
+
+<div class="status" id="status">
+Ready — create your building.
+</div>
+
+</section>
+</div>
+</div>
 
 <script>
+const STORAGE="buildspace_complete_v1";
+
+let state={
+name:"My Building",
+floor:0,
+style:"modern",
+zoom:1,
+floors:[
+{rooms:[],objects:[]},
+{rooms:[],objects:[]},
+{rooms:[],objects:[]},
+{rooms:[],objects:[]}
+]
+};
+
+let selected=null;
+let drag=null;
+let resize=null;
+
+const sizes={
+SOFA:[140,65],
+BED:[150,85],
+TABLE:[100,70],
+CHAIR:[55,55],
+DESK:[110,60],
+TV:[100,45],
+PLANT:[55,55],
+LAMP:[45,60],
+WARDROBE:[100,55],
+DOOR:[70,25],
+WINDOW:[100,20],
+STAIRS:[80,80]
+};
+
+function uid(){
+return Date.now().toString(36)+Math.random().toString(36).slice(2);
+}
+
+function floorData(){
+return state.floors[state.floor];
+}
+
+function render(){
+
 const canvas=document.getElementById("canvas");
-let count=0;
 
-function addRoom(){
- const r=document.createElement("div");
- r.className="room";
- r.textContent="ROOM";
- r.style.left=(30+(count%2)*430)+"px";
- r.style.top=(30+Math.floor(count/2)*250)+"px";
- r.style.width="380px";
- r.style.height="210px";
- canvas.appendChild(r);
- count++;
+canvas.className="canvas";
+
+if(state.style==="japanese")canvas.classList.add("japanese");
+if(state.style==="industrial")canvas.classList.add("dark");
+if(state.style==="luxury")canvas.classList.add("luxury");
+
+canvas.style.transform="scale("+state.zoom+")";
+
+canvas.innerHTML="";
+
+floorData().rooms.forEach(drawRoom);
+floorData().objects.forEach(drawObject);
+
+document.getElementById("projectTitle").textContent=state.name;
+document.getElementById("buildingName").value=state.name;
+
+document.getElementById("status").textContent=
+state.name+
+" | Floor "+(state.floor+1)+
+" | "+floorData().rooms.length+" rooms"+
+" | "+floorData().objects.length+" objects";
+
+localStorage.setItem(STORAGE,JSON.stringify(state));
 }
 
-function addItem(name){
- const e=document.createElement("div");
- e.className="item";
- e.textContent=name;
- e.style.left=(80+(count%6)*120)+"px";
- e.style.top=(100+(count%4)*100)+"px";
- canvas.appendChild(e);
- count++;
+function drawRoom(r){
+
+const el=document.createElement("div");
+
+el.className="room"+(selected===r.id?" selected":"");
+
+el.style.left=r.x+"px";
+el.style.top=r.y+"px";
+el.style.width=r.w+"px";
+el.style.height=r.h+"px";
+
+const name=document.createElement("div");
+name.className="roomName";
+name.textContent=r.name;
+
+el.appendChild(name);
+
+el.addEventListener("pointerdown",e=>{
+if(e.target!==el)return;
+
+selected=r.id;
+
+startDrag(e,r);
+});
+
+el.addEventListener("click",e=>{
+e.stopPropagation();
+selected=r.id;
+render();
+});
+
+document.getElementById("canvas").appendChild(el);
 }
 
-function design(){
- canvas.style.background="#f5f1e8";
- alert("Japanese minimalist design applied");
+function drawObject(o){
+
+const el=document.createElement("div");
+
+el.className="object"+(selected===o.id?" selected":"");
+
+el.style.left=o.x+"px";
+el.style.top=o.y+"px";
+el.style.width=o.w+"px";
+el.style.height=o.h+"px";
+el.style.transform="rotate("+o.rotation+"deg)";
+
+el.textContent=o.label;
+
+const label=document.createElement("div");
+label.className="objectLabel";
+label.textContent=o.name;
+el.appendChild(label);
+
+const handle=document.createElement("div");
+handle.className="resize";
+el.appendChild(handle);
+
+el.addEventListener("pointerdown",e=>{
+e.stopPropagation();
+
+if(e.target===handle){
+selected=o.id;
+startResize(e,o);
+}else{
+selected=o.id;
+startDrag(e,o);
+}
+});
+
+document.getElementById("canvas").appendChild(el);
 }
 
-function save(){
- localStorage.setItem("buildspace",canvas.innerHTML);
- alert("Design saved");
+function startDrag(e,item){
+
+drag={
+item:item,
+sx:e.clientX,
+sy:e.clientY,
+x:item.x,
+y:item.y
+};
+
+e.currentTarget.setPointerCapture(e.pointerId);
+
+const move=ev=>{
+if(!drag||drag.item!==item)return;
+
+item.x=Math.max(0,Math.min(930,
+drag.x+(ev.clientX-drag.sx)/state.zoom));
+
+item.y=Math.max(0,Math.min(580,
+drag.y+(ev.clientY-drag.sy)/state.zoom));
+
+e.currentTarget.style.left=item.x+"px";
+e.currentTarget.style.top=item.y+"px";
+};
+
+const end=()=>{
+drag=null;
+document.removeEventListener("pointermove",move);
+document.removeEventListener("pointerup",end);
+localStorage.setItem(STORAGE,JSON.stringify(state));
+};
+
+document.addEventListener("pointermove",move);
+document.addEventListener("pointerup",end);
 }
 
-const saved=localStorage.getItem("buildspace");
-if(saved)canvas.innerHTML=saved;
+function startResize(e,item){
+
+resize={
+item:item,
+sx:e.clientX,
+sy:e.clientY,
+w:item.w,
+h:item.h
+};
+
+const move=ev=>{
+if(!resize)return;
+
+item.w=Math.max(35,
+resize.w+(ev.clientX-resize.sx)/state.zoom);
+
+item.h=Math.max(25,
+resize.h+(ev.clientY-resize.sy)/state.zoom);
+
+render();
+};
+
+const end=()=>{
+resize=null;
+};
+
+document.addEventListener("pointermove",move);
+document.addEventListener("pointerup",end);
+}
+
+function addRoom(name){
+
+const f=floorData();
+const i=f.rooms.length;
+
+const room={
+id:uid(),
+name:name,
+x:40+(i%2)*470,
+y:40+Math.floor(i/2)*260,
+w:400,
+h:210
+};
+
+f.rooms.push(room);
+selected=room.id;
+
+render();
+}
+
+function addObject(name,label){
+
+const f=floorData();
+
+const s=sizes[label]||[70,50];
+
+const o={
+id:uid(),
+name:name,
+label:label,
+x:100+(f.objects.length%6)*130,
+y:100+(f.objects.length%4)*110,
+w:s[0],
+h:s[1],
+rotation:0
+};
+
+f.objects.push(o);
+selected=o.id;
+
+render();
+}
+
+function selectedItem(){
+
+const f=floorData();
+
+return f.objects.find(x=>x.id===selected)||
+f.rooms.find(x=>x.id===selected);
+}
+
+function deleteSelected(){
+
+if(!selected)return;
+
+const f=floorData();
+
+f.rooms=f.rooms.filter(x=>x.id!==selected);
+f.objects=f.objects.filter(x=>x.id!==selected);
+
+selected=null;
+
+render();
+}
+
+function duplicateSelected(){
+
+const item=selectedItem();
+
+if(!item)return;
+
+const copy=JSON.parse(JSON.stringify(item));
+
+copy.id=uid();
+copy.x+=25;
+copy.y+=25;
+
+if(item.name&&
+floorData().objects.some(x=>x.id===item.id)){
+floorData().objects.push(copy);
+}else{
+floorData().rooms.push(copy);
+}
+
+selected=copy.id;
+render();
+}
+
+function rotateSelected(){
+
+const item=selectedItem();
+
+if(!item)return;
+
+item.rotation=(item.rotation||0)+15;
+
+render();
+}
+
+function changeFloor(){
+
+state.floor=Number(document.getElementById("floor").value);
+selected=null;
+
+render();
+}
+
+function zoom(amount){
+
+state.zoom=Math.max(.5,Math.min(1.5,state.zoom+amount));
+
+render();
+}
+
+function resetZoom(){
+
+state.zoom=1;
+render();
+}
+
+function applyStyle(style){
+
+state.style=style;
+
+render();
+
+document.getElementById("status").textContent=
+"Applied "+style+" interior style.";
+}
+
+function aiDesign(){
+
+const text=document.getElementById("prompt").value.toLowerCase();
+
+let style="modern";
+
+if(text.includes("japan")||
+text.includes("zen")||
+text.includes("minimal"))
+style="japanese";
+
+if(text.includes("scandinav")||
+text.includes("nordic"))
+style="scandinavian";
+
+if(text.includes("industrial")||
+text.includes("loft"))
+style="industrial";
+
+if(text.includes("luxury")||
+text.includes("premium"))
+style="luxury";
+
+state.style=style;
+
+const f=floorData();
+
+if(f.rooms.length===0)
+addRoom(
+text.includes("bed")?"Bedroom":
+text.includes("kitchen")?"Kitchen":
+text.includes("office")?"Office":
+"Living Room"
+);
+
+const room=f.rooms[0];
+
+let furniture=[];
+
+if(text.includes("bed"))
+furniture=["BED","WARDROBE","LAMP","PLANT"];
+else if(text.includes("kitchen"))
+furniture=["TABLE","CHAIR","PLANT"];
+else if(text.includes("office"))
+furniture=["DESK","CHAIR","LAMP","PLANT"];
+else
+furniture=["SOFA","TABLE","TV","PLANT"];
+
+furniture.forEach((type,i)=>{
+
+const s=sizes[type];
+
+f.objects.push({
+id:uid(),
+name:type,
+label:type,
+x:room.x+40+(i%2)*150,
+y:room.y+70+Math.floor(i/2)*80,
+w:s[0],
+h:s[1],
+rotation:0
+});
+
+});
+
+render();
+
+document.getElementById("status").textContent=
+"AI design created: "+style;
+}
+
+function clearFloor(){
+
+if(!confirm("Clear this floor?"))return;
+
+state.floors[state.floor]={
+rooms:[],
+objects:[]
+};
+
+selected=null;
+
+render();
+}
+
+function newProject(){
+
+if(!confirm("Start a new building?"))return;
+
+state={
+name:"My Building",
+floor:0,
+style:"modern",
+zoom:1,
+floors:[
+{rooms:[],objects:[]},
+{rooms:[],objects:[]},
+{rooms:[],objects:[]},
+{rooms:[],objects:[]}
+]
+};
+
+selected=null;
+
+render();
+}
+
+function saveProject(){
+
+state.name=
+document.getElementById("buildingName").value||
+"My Building";
+
+localStorage.setItem(STORAGE,JSON.stringify(state));
+
+downloadFile(
+state.name.replace(/[^a-z0-9]/gi,"_")+".json",
+JSON.stringify(state,null,2),
+"application/json"
+);
+
+document.getElementById("status").textContent="Project saved.";
+}
+
+function exportJSON(){
+saveProject();
+}
+
+function importJSON(event){
+
+const file=event.target.files[0];
+
+if(!file)return;
+
+const reader=new FileReader();
+
+reader.onload=e=>{
+
+try{
+
+const data=JSON.parse(e.target.result);
+
+if(!data.floors)throw new Error();
+
+state=data;
+selected=null;
+
+render();
+
+alert("Project imported.");
+
+}catch(err){
+
+alert("Invalid BuildSpace file.");
+
+}
+
+};
+
+reader.readAsText(file);
+event.target.value="";
+}
+
+function downloadFile(name,data,type){
+
+const blob=new Blob([data],{type:type});
+const url=URL.createObjectURL(blob);
+
+const a=document.createElement("a");
+a.href=url;
+a.download=name;
+a.click();
+
+setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function downloadDesign(){
+
+const f=floorData();
+
+let svg=
+'<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650">';
+
+svg+='<rect width="100%" height="100%" fill="#f8fafc"/>';
+
+f.rooms.forEach(r=>{
+
+svg+=
+'<rect x="'+r.x+'" y="'+r.y+
+'" width="'+r.w+'" height="'+r.h+
+'" fill="#ffffff" fill-opacity=".7" stroke="#475569" stroke-width="4"/>';
+
+svg+=
+'<text x="'+(r.x+10)+'" y="'+(r.y+25)+
+'" font-family="Arial" font-size="15" font-weight="bold">'+
+escapeXML(r.name)+'</text>';
+
+});
+
+f.objects.forEach(o=>{
+
+svg+=
+'<rect x="'+o.x+'" y="'+o.y+
+'" width="'+o.w+'" height="'+o.h+
+'" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>';
+
+svg+=
+'<text x="'+(o.x+5)+'" y="'+(o.y+25)+
+'" font-family="Arial" font-size="11">'+
+escapeXML(o.label)+'</text>';
+
+});
+
+svg+="</svg>";
+
+downloadFile(
+"buildspace-floor-"+(state.floor+1)+".svg",
+svg,
+"image/svg+xml"
+);
+}
+
+function escapeXML(s){
+
+return String(s)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;");
+}
+
+function toggleSidebar(){
+
+document.getElementById("sidebar").classList.toggle("open");
+}
+
+document.getElementById("canvas").addEventListener("click",()=>{
+selected=null;
+render();
+});
+
+document.getElementById("buildingName").addEventListener("change",e=>{
+state.name=e.target.value||"My Building";
+render();
+});
+
+const saved=localStorage.getItem(STORAGE);
+
+if(saved){
+
+try{
+state=JSON.parse(saved);
+}catch(e){}
+
+}
+
+render();
 </script>
 
 </body>
 </html>
+
