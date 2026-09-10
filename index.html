@@ -1,1 +1,80 @@
-<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>BuildSpace</title><style>body{margin:0;font-family:Arial;background:#111827;color:white}header{padding:15px;background:#1e293b}button{padding:10px;margin:4px;border:0;border-radius:8px}.canvas{width:900px;height:600px;background:#f8fafc;position:relative;margin:20px auto;color:#111;overflow:hidden}.item{position:absolute;padding:15px;font-size:35px;cursor:move}#tools{padding:10px;text-align:center}</style></head><body><header><b>🏗️ BuildSpace</b> — Building & Interior Studio</header><div id="tools"><button onclick="room()">🛋️ Living Room</button><button onclick="room()">🛏️ Bedroom</button><button onclick="add("Sofa","🛋️")">Sofa</button><button onclick="add("Bed","🛏️")">Bed</button><button onclick="add("Table","🪑")">Table</button><button onclick="add("Plant","🪴")">Plant</button><button onclick="styleRoom()">✨ AI Design</button><button onclick="save()">💾 Save</button></div><div class="canvas" id="canvas"></div><script>let c=document.getElementById("canvas"),n=0;function room(){let x=document.createElement("div");x.className="item";x.textContent="▣ ROOM";x.style.left=(50+n%3*280)+"px";x.style.top=(50+Math.floor(n/3)*180)+"px";c.append(x);n++}function add(name,icon){let x=document.createElement("div");x.className="item";x.textContent=icon;x.title=name;x.style.left=100+n%5*130+"px";x.style.top=120+Math.floor(n/5)*100+"px";c.append(x);n++}function styleRoom(){c.style.background="#f5f1e8";alert("AI Japanese minimalist design applied")}function save(){localStorage.setItem("buildspace",c.innerHTML);alert("Design saved")}if(localStorage.getItem("buildspace"))c.innerHTML=localStorage.getItem("buildspace")</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BuildSpace</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#111827;color:white}
+header{padding:16px;background:#1e293b;font-size:20px;font-weight:bold}
+nav{padding:10px;background:#0f172a;display:flex;gap:6px;flex-wrap:wrap}
+button{padding:10px 13px;border:0;border-radius:8px;background:#2563eb;color:white}
+button:active{background:#1d4ed8}
+#canvas{position:relative;width:900px;height:600px;margin:20px auto;background:#f8fafc;color:#111;overflow:hidden}
+.item{position:absolute;padding:10px;font-size:32px;cursor:move;user-select:none}
+.room{position:absolute;border:4px solid #475569;background:#ffffff;color:#111;padding:8px}
+@media(max-width:700px){
+#canvas{transform:scale(.55);transform-origin:top left;margin-left:10px}
+}
+</style>
+</head>
+
+<body>
+
+<header>BUILDSPACE - AI ROOM DESIGNER</header>
+
+<nav>
+<button onclick="addRoom()">ROOM</button>
+<button onclick="addItem('SOFA')">SOFA</button>
+<button onclick="addItem('BED')">BED</button>
+<button onclick="addItem('TABLE')">TABLE</button>
+<button onclick="addItem('PLANT')">PLANT</button>
+<button onclick="design()">AI DESIGN</button>
+<button onclick="save()">SAVE</button>
+</nav>
+
+<div id="canvas"></div>
+
+<script>
+const canvas=document.getElementById("canvas");
+let count=0;
+
+function addRoom(){
+ const r=document.createElement("div");
+ r.className="room";
+ r.textContent="ROOM";
+ r.style.left=(30+(count%2)*430)+"px";
+ r.style.top=(30+Math.floor(count/2)*250)+"px";
+ r.style.width="380px";
+ r.style.height="210px";
+ canvas.appendChild(r);
+ count++;
+}
+
+function addItem(name){
+ const e=document.createElement("div");
+ e.className="item";
+ e.textContent=name;
+ e.style.left=(80+(count%6)*120)+"px";
+ e.style.top=(100+(count%4)*100)+"px";
+ canvas.appendChild(e);
+ count++;
+}
+
+function design(){
+ canvas.style.background="#f5f1e8";
+ alert("Japanese minimalist design applied");
+}
+
+function save(){
+ localStorage.setItem("buildspace",canvas.innerHTML);
+ alert("Design saved");
+}
+
+const saved=localStorage.getItem("buildspace");
+if(saved)canvas.innerHTML=saved;
+</script>
+
+</body>
+</html>
