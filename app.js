@@ -30,6 +30,56 @@ function inspector(){const i=selected();return `<aside class="inspect"><div clas
 function modal(){if(S.modal==='help')return `<div class="modalBack"><div class="modal"><button class="close" data-a="close">×</button><h2>Realistische Assets</h2><p>Für Sims-artige Möbel brauchst du echte <b>GLB/GLTF 3D-Modelle</b> oder transparente <b>PNG/WebP</b>-Renderings. Importiere sie hier direkt vom Handy. Die Bibliothek wird im Browser gespeichert.</p><ol><li>Furniture Kit von Kenney herunterladen.</li><li>ZIP entpacken.</li><li>Mehrere .glb Dateien auswählen.</li><li>Sie erscheinen unter „Meine echten Assets“.</li></ol><p>Für die beste mobile Performance zuerst etwa 20–40 Modelle importieren, nicht 140 gleichzeitig auf der Szene.</p><button class="primary wide" data-a="close">Verstanden</button></div></div>`;if(S.modal==='ai')return `<div class="modalBack"><div class="modal"><button class="close" data-a="close">×</button><h2>✦ Raumkonzept</h2><p>Beschreibe den gewünschten Raum. BuildSpace setzt daraus eine komplette Einrichtung zusammen.</p><textarea id="prompt" placeholder="z.B. modernes deutsches Wohnzimmer mit Eiche, Sofa, TV-Wand, Pflanzen und warmem Licht"></textarea><div class="suggest">${['Modernes deutsches Wohnzimmer','Bauhaus Küche mit Insel','Japandi Schlafzimmer','Berliner Loft Arbeitszimmer'].map(x=>`<button data-suggest="${x}">${x}</button>`).join('')}</div><button class="primary wide" data-a="generate">Konzept anwenden</button></div></div>`;return ''}
 function bind(){document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>act(b.dataset.a));document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{S.tool=b.dataset.tool;render()});document.querySelectorAll('[data-level]').forEach(b=>b.onclick=()=>level(+b.dataset.level));document.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>roomAdd(+b.dataset.room));document.querySelectorAll('[data-build]').forEach(b=>b.onclick=()=>commit(template(S.project,BUILDINGS[+b.dataset.build][0]),null));document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{S.cat=b.dataset.cat;render()});document.querySelectorAll('[data-real]').forEach(b=>b.onclick=()=>{S.realTab=b.dataset.real;render()});document.querySelectorAll('[data-realadd]').forEach(b=>b.onclick=()=>addReal(REAL.find(x=>x.id===b.dataset.realadd)));document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>add(b.dataset.add));const q=$('#q');if(q)q.oninput=e=>{S.query=e.target.value;render()};document.querySelectorAll('[data-id]').forEach(el=>{el.onpointerdown=e=>drag(e,el.dataset.id);el.onclick=e=>{e.stopPropagation();S.selected=el.dataset.id;S.inspect=true;render()}});document.querySelectorAll('[data-del]').forEach(b=>b.onclick=e=>{e.stopPropagation();S.selected=b.dataset.del;del()});document.querySelectorAll('[data-rot]').forEach(b=>b.onclick=e=>{e.stopPropagation();S.selected=b.dataset.rot;patchItem({rotation:(selected().rotation+15)%360})});document.querySelectorAll('[data-p]').forEach(el=>el.oninput=e=>{let v=e.target.value;const t=el.dataset.p;if(['x','y','w','h','rotation','scale'].includes(t))v=Number(v);patchItem({[t]:v})});document.querySelectorAll('[data-proj]').forEach(el=>el.oninput=e=>{S.project={...S.project,[el.dataset.proj]:el.type==='number'?Number(e.target.value):e.target.value};save(S.project)});document.querySelectorAll('[data-suggest]').forEach(b=>b.onclick=()=>$('#prompt').value=b.dataset.suggest);const c=$('#canvas');if(c){c.ondragover=e=>e.preventDefault();c.ondrop=e=>{const id=e.dataTransfer?.getData('asset');if(id)add(id,100,100)}}}
 function drag(e,id){if(S.tool!=='select')return;e.preventDefault();S.selected=id;S.inspect=true;const i=selected(),sx=e.clientX,sy=e.clientY,ix=i.x,iy=i.y;let moved=false;const mv=v=>{moved=true;i.x=snap(ix+(v.clientX-sx)/S.zoom);i.y=snap(iy+(v.clientY-sy)/S.zoom);const el=document.querySelector(`[data-id="${id}"]`);if(el){el.style.left=i.x+'px';el.style.top=i.y+'px'}};const up=()=>{document.removeEventListener('pointermove',mv);if(moved){S.history.push(clone({...S.project,items:S.project.items.map(x=>x.id===id?{...x,x:i.x,y:i.y}:x)}));S.project.updatedAt=new Date().toISOString();save(S.project)}render()};document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up,{once:true})}
-async function importReal(){const input=document.createElement('input');input.type='file';input.multiple=true;input.accept='.glb,.gltf,.png,.jpg,.jpeg,.webp';input.onchange=async()=>{if(!input.files.length)return;REAL=await putAssets([...input.files]);S.query='';S.realTab=[...input.files].some(f=>/\.(glb|gltf)$/i.test(f.name))?'models':'images';render()};input.click()}
+async function importReal(){
+      const input=document.createElement('input');
+
+        input.type='file';
+          input.multiple=true;
+            input.accept='*/*';
+
+              input.style.position='fixed';
+                input.style.left='-9999px';
+                  document.body.appendChild(input);
+
+                    input.onchange=async()=>{
+                        try{
+                              const files=[...input.files];
+
+                                    if(!files.length){
+                                            input.remove();
+                                                    return;
+                                                          }
+
+                                                                const allowed=files.filter(f =>
+                                                                        /\.(glb|gltf|png|jpg|jpeg|webp)$/i.test(f.name)
+                                                                              );
+
+                                                                                    if(!allowed.length){
+                                                                                            alert('Keine unterstützte Datei gefunden. Bitte GLB, GLTF, PNG, JPG oder WEBP auswählen.');
+                                                                                                    input.remove();
+                                                                                                            return;
+                                                                                                                  }
+
+                                                                                                                        REAL=await putAssets(allowed);
+
+                                                                                                                              S.query='';
+                                                                                                                                    S.realTab=allowed.some(f =>
+                                                                                                                                            /\.(glb|gltf)$/i.test(f.name)
+                                                                                                                                                  ) ? 'models' : 'images';
+
+                                                                                                                                                        render();
+
+                                                                                                                                                            }catch(err){
+                                                                                                                                                                  console.error('Asset import error:',err);
+                                                                                                                                                                        alert('Import fehlgeschlagen: '+err.message);
+                                                                                                                                                                            }finally{
+                                                                                                                                                                                  input.remove();
+                                                                                                                                                                                      }
+                                                                                                                                                                                        };
+
+                                                                                                                                                                                          document.body.appendChild(input);
+                                                                                                                                                                                            input.click();
+                                                                                                                                                                                            }
+}
 async function act(a){if(a==='side')S.side=!S.side;else if(a==='inspect')S.inspect=!S.inspect;else if(a==='undo')undo();else if(a==='redo')redo();else if(a==='new'){S.project=load();S.project.name='Neues Wohnprojekt';S.selected=null}else if(a==='save'){save(S.project);S.project.updatedAt=new Date().toISOString()}else if(a==='export')exportFile(S.project);else if(a==='ai')S.modal='ai';else if(a==='help'||a==='assetHelp')S.modal='help';else if(a==='import')await importReal();else if(a==='clearSearch'){S.query='';S.cat='All';render()}else if(a==='close')S.modal=null;else if(a==='generate'){S.project=concept(S.project,$('#prompt').value);S.modal=null;S.selected=null}else if(a==='duplicate')duplicate();else if(a==='delete')del();else if(a==='removeReal'){const i=selected();if(i?.realAssetId){await removeAsset(i.realAssetId);REAL=await listAssets();S.selected=null;render()}}else if(a==='rot')patchItem({rotation:(selected().rotation+90)%360});else if(a==='plus')S.zoom=Math.min(1.5,S.zoom+.08);else if(a==='minus')S.zoom=Math.max(.4,S.zoom-.08);else if(a==='fit')fit();render()}
 window.onkeydown=e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z')undo();if((e.ctrlKey||e.metaKey)&&e.key==='y')redo();if(e.key==='Delete')del()};setInterval(()=>save(S.project),5000);boot();
